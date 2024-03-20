@@ -29,3 +29,51 @@ export const SampleUser = [
         _id: "2",
     },
 ]
+
+export const SampleNotification = [
+    {
+        sender: {
+            avatar: "https://gravatar.com/avatar/0184235fafa80c6bad0ae400784d6a2c?s=400&d=robohash&r=x",
+            name: 'Kulesh kumar',
+        },
+        _id: "1"
+    },
+    {
+        sender: {
+            avatar: "https://gravatar.com/avatar/8282ca32dc3a94607000db4f10ebd656?s=400&d=robohash&r=x",
+            name: 'Komal kumari',
+        },
+        _id: "2"
+    },
+]
+
+export const SampleMessage = [
+    {
+        attachments: [{
+            public_id: "assad",
+            url: "https://www.w3schools.com/howto/img avatar.png"
+        }],
+        content: "L*uda ka message hai",
+        _id: "snskskajfsoi",
+        sender: {
+            _id: "sadakjdassds",
+            name: "Chaman",
+        },
+        chat: "chatId",
+        createdAt: "2024-03-20T09:02:01.865Z"
+    },
+    {
+        attachments: [{
+            public_id: "assad 2",
+            url: "https://www.w3schools.com/howto/img avatar.png"
+        }],
+        content: "L*uda 2 ka message hai",
+        _id: "snskskajfsoi",
+        sender: {
+            _id: "assds",
+            name: "Chaman",
+        },
+        chat: "chatId",
+        createdAt: "2024-03-20T09:02:01.865Z"
+    }
+]

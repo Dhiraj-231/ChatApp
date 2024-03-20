@@ -1,18 +1,16 @@
+import { useInputValidation } from "6pp";
+import { Search as SearchIcon } from "@mui/icons-material";
 import {
   Dialog,
   DialogTitle,
   InputAdornment,
   List,
-  ListItem,
-  ListItemText,
   Stack,
   TextField,
 } from "@mui/material";
 import React, { useState } from "react";
-import { useInputValidation } from "6pp";
-import { Search as SearchIcon } from "@mui/icons-material";
-import UserItem from "../shared/UserItem";
 import { SampleUser } from "../../constants/SampleData";
+import UserItem from "../shared/UserItem";
 const Search = () => {
   const search = useInputValidation("");
   const isLoadingSendFriendRequest = false;

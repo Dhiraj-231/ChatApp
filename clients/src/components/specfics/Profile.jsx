@@ -1,11 +1,11 @@
-import { Avatar, Stack, Typography } from "@mui/material";
-import React from "react";
 import {
+  CalendarMonth as CalendarIcon,
   Face as FaceIcon,
   AlternateEmail as UserNameIcon,
-  CalendarMonth as CalendarIcon,
 } from "@mui/icons-material";
+import { Avatar, Stack, Typography } from "@mui/material";
 import moment from "moment";
+import React from "react";
 const Profile = () => {
   return (
     <Stack spacing={"2rem"} direction={"column"} alignItems={"center"}>
