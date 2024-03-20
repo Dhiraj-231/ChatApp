@@ -16,3 +16,16 @@ export const sampleChats = [
         members: ["1", "2"]
     }
 ]
+
+export const SampleUser = [
+    {
+        avatar: "https://gravatar.com/avatar/1efa155286ab3bf1b3b48ed376defe0b?s=400&d=robohash&r=x",
+        name: 'Akash kumar',
+        _id: "1",
+    },
+    {
+        avatar: "https://gravatar.com/avatar/0184235fafa80c6bad0ae400784d6a2c?s=400&d=robohash&r=x",
+        name: 'Kulesh kumar',
+        _id: "2",
+    },
+]
