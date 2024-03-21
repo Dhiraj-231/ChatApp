@@ -1,7 +1,9 @@
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import React, { memo } from "react";
 import { lightBlue } from "../../constants/Color";
 import moment from "moment";
+import { fileFormat } from "../../lib/feather";
+import ReanderAttach from "./ReanderAttach";
 
 const MessageComponent = ({ message, user }) => {
   const { sender, content, attachments = [], createdAt } = message;
@@ -24,7 +26,19 @@ const MessageComponent = ({ message, user }) => {
         </Typography>
       )}
       {content && <Typography>{content}</Typography>}
-      {/*Attachements */}
+      {attachments.length > 0 &&
+        attachments.map((attachment, index) => {
+          const url = attachment.url;
+          const file = fileFormat(url);
+
+          return (
+            <Box key={index}>
+              <a href={url} target="_blank" download style={{ color: "black" }}>
+                {ReanderAttach(file, url)}
+              </a>
+            </Box>
+          );
+        })}
 
       <Typography variant="caption" color={"text.secondary"} fontSize={"10px"}>
         {timeAgo}

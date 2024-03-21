@@ -10,10 +10,10 @@ import { InputBox } from "../components/Styles/StyleComponents";
 import FileMenu from "../dialogs/FileMenu";
 import { SampleMessage } from "../constants/SampleData";
 import MessageComponent from "../components/shared/MessageComponent";
-const user={
-  _id:"assds",
-  name:"Dhiraj"
-}
+const user = {
+  _id: "assds",
+  name: "Dhiraj",
+};
 const Chat = () => {
   const containerRef = useRef(null);
   return (
@@ -27,8 +27,8 @@ const Chat = () => {
         height={"90%"}
         sx={{ overflowX: "hidden", overflowY: "auto" }}
       >
-        {SampleMessage.map((i)=>(
-          <MessageComponent message={i} user={user}/>
+        {SampleMessage.map((i, index) => (
+          <MessageComponent message={i} user={user} key={index} />
         ))}
       </Stack>
       <form
