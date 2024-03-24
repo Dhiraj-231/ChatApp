@@ -1,6 +1,7 @@
 import { Stack } from "@mui/material";
 import React from "react";
 import Chatitem from "../shared/Chatitem";
+import { bgGridents } from "../../constants/Color";
 
 const ChatList = ({
   w = "100%",
@@ -11,7 +12,15 @@ const ChatList = ({
   handleDeleteChat,
 }) => {
   return (
-    <Stack width={w} direction={"column"}>
+    <Stack
+      width={w}
+      direction={"column"}
+      overflow={"auto"}
+      height={"100%"}
+      sx={{
+        backgroundImage: bgGridents,
+      }}
+    >
       {chats?.map((data, index) => {
         const { _id, name, groupChat, avatar, members } = data;
         const [{ ChatId, count }] = newMessage;

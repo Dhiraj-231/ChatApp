@@ -4,15 +4,19 @@ import {
   Button,
   Container,
   IconButton,
+  InputAdornment,
   Paper,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { CameraAlt } from "@mui/icons-material";
 import { VisuallyHiddenInput } from "../components/Styles/StyleComponents";
 import { useFileHandler, useInputValidation, useStrongPassword } from "6pp";
 import { userNameValidator } from "../utils/Validators.js";
+import { bgGridents } from "../constants/Color.js";
 const Login = () => {
   const [isLogin, SetIsLogin] = useState(true);
   const name = useInputValidation("");
@@ -20,7 +24,11 @@ const Login = () => {
   const username = useInputValidation("", userNameValidator);
   const password = useStrongPassword();
   const avatar = useFileHandler("single");
+  const [showPassword, setShowPassword] = useState(false);
 
+  const togglePasswordVisibility = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
   const handleSignUp = (e) => {
     e.preventDefault();
   };
@@ -30,8 +38,7 @@ const Login = () => {
   return (
     <div
       style={{
-        backgroundImage:
-          "linear-gradient(rgba(255,225,209,0.5),rgba(249,159,159,0.5))",
+        backgroundImage: bgGridents,
       }}
     >
       <Container
@@ -76,11 +83,27 @@ const Login = () => {
                   required
                   fullWidth
                   label="Password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   margin="normal"
                   variant="outlined"
                   value={password.value}
                   onChange={password.changeHandler}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={togglePasswordVisibility}
+                          edge="end"
+                        >
+                          {showPassword ? (
+                            <VisibilityIcon />
+                          ) : (
+                            <VisibilityOffIcon />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 <Button
                   fullWidth
@@ -180,11 +203,27 @@ const Login = () => {
                   required
                   fullWidth
                   label="Password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   margin="normal"
                   variant="outlined"
                   value={password.value}
                   onChange={password.changeHandler}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={togglePasswordVisibility}
+                          edge="end"
+                        >
+                          {showPassword ? (
+                            <VisibilityIcon />
+                          ) : (
+                            <VisibilityOffIcon />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 {password.error && (
                   <Typography color="error" variant="caption">
