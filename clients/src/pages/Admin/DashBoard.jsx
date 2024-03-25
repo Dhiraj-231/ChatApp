@@ -1,6 +1,9 @@
 import {
   AdminPanelSettings as AdminPanelSettingsIcon,
+  Group as GroupIcon,
+  Message as MessageIcon,
   Notifications as NotificationsIcon,
+  Person as PersonIcon,
 } from "@mui/icons-material";
 import {
   Box,
@@ -17,6 +20,7 @@ import {
   SearchField,
 } from "../../components/Styles/StyleComponents";
 import AdminLayOut from "../../components/layouts/AdminLayOut";
+import { DoughnutChat, LineChart } from "../../components/specfics/Chart";
 
 const DashBoard = () => {
   const Appbar = (
@@ -47,7 +51,19 @@ const DashBoard = () => {
     </Paper>
   );
 
-  const widgets = () => <>Dsf</>;
+  const Widgets = () => (
+    <Stack
+      direction={{ xs: "column", sm: "row" }}
+      spacing={"2rem"}
+      justifyContent={"space-between"}
+      alignItems={"center"}
+      margin={"2rem 0"}
+    >
+      <Widget tittle={"User"} value={34} icon={<PersonIcon />} />
+      <Widget tittle={"Chat"} value={3} icon={<GroupIcon />} />
+      <Widget tittle={"Message"} value={453} icon={<MessageIcon />} />
+    </Stack>
+  );
 
   return (
     <AdminLayOut>
@@ -66,7 +82,7 @@ const DashBoard = () => {
             <Typography variant="body1" margin={"2rem 0"}>
               Last Messages
             </Typography>
-            {"chat"}
+            <LineChart value={[23, 10, 34, 5]} />
           </Paper>
           <Paper
             elevation={3}
@@ -81,13 +97,60 @@ const DashBoard = () => {
               maxWidth: "25rem",
             }}
           >
-            DountChat
+            <DoughnutChat
+              labels={["Single chats", "Group Chats"]}
+              value={[53, 47]}
+            />
+
+            <Stack
+              position={"absolute"}
+              direction={"row"}
+              justifyContent={"center"}
+              alignItems={"center"}
+              spacing={"0.5rem"}
+              width={"100%"}
+              height={"100%"}
+            >
+              <GroupIcon /> <Typography>VS</Typography>
+              <PersonIcon />
+            </Stack>
           </Paper>
         </Stack>
-        {widgets}
+        <Widgets />
       </Container>
     </AdminLayOut>
   );
 };
-
+const Widget = ({ tittle, value, icon }) => (
+  <Paper
+    elevation={3}
+    sx={{
+      padding: "2rem",
+      margin: "2rem 0",
+      borderRadius: "1.5rem",
+      width: "20rem",
+    }}
+  >
+    <Stack alignItems={"center"} spacing={"1rem"}>
+      <Typography
+        sx={{
+          color: "rgba(0,0,0,0.7)",
+          borderRadius: "50%",
+          border: "5px solid rgba(0,0,0,0.9)",
+          width: "5rem",
+          height: "5rem",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {value}
+      </Typography>
+      <Stack direction={"row"} spacing={"1rem"} alignItems={"center"}>
+        {icon}
+        <Typography>{tittle}</Typography>
+      </Stack>
+    </Stack>
+  </Paper>
+);
 export default DashBoard;
