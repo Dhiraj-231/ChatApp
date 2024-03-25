@@ -11,7 +11,12 @@ import {
   Legend,
   LineElement,
 } from "chart.js";
-import { orange, purple, purpleLight } from "../../constants/Color";
+import {
+  orange,
+  orangeLight,
+  purple,
+  purpleLight,
+} from "../../constants/Color";
 import { getLast7Days } from "../../lib/feather";
 
 ChartJS.register(
@@ -87,7 +92,7 @@ const DoughnutChat = ({ value = [], labels = [] }) => {
         data: value,
         label: "Total Chats vs Group Chats",
         fill: true,
-        backgroundColor: [purpleLight, orange],
+        backgroundColor: [purpleLight, orangeLight],
         borderColor: [purple, orange],
         offset: 20,
       },
