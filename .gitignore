@@ -10,7 +10,7 @@ node_modules
 dist
 dist-ssr
 *.local
-
+*.env
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -21,5 +21,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-# Ignore .env file
-server/configs/.env

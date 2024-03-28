@@ -1,9 +1,10 @@
-import { ALERT, REFETCH_CHATS } from "../constants/event.js";
+import { ALERT, NEW_ATTACHMENT, NEW_MESSAGE_ALERT, REFETCH_CHATS } from "../constants/event.js";
 import { getOtherMember } from "../lib/helper.js";
 import { Chat } from "../models/Chat.model.js";
 import { ApiError } from "../utils/ApiError.js"
 import { emitEvent } from "../utils/feather.js";
 import { User } from "../models/User.model.js";
+import { Message } from "../models/Message.model.js";
 export const newGroupChat = async (req, res) => {
     try {
         const { name, members } = req.body;
@@ -183,6 +184,88 @@ export const leaveGroup = async (req, res) => {
         res.status(400).json({
             success: false,
             message: error.message
+        })
+    }
+}
+
+export const sendAttachment = async (req, res) => {
+    try {
+        const { chatId } = req.body;
+        const [chat, me] = await Promise.all([Chat.findById(chatId), User.findById(req.user, "name")]);
+        if (!chat) throw new ApiError(404, "Chat not found...");
+        const files = req.files || [];
+        if (files.length < 1) throw new ApiError(400, "Please provide attachements");
+        const attachments = [];
+        const messageForRealTime = {
+            content: "", attachments, sender: {
+                _id: me._id,
+                name: me.name,
+            }, chat: chatId
+        };
+        const messageForDb = { content: "", attachments, sender: me._id, chat: chatId };
+        const message = await Message.create(messageForDb);
+        emitEvent(req, NEW_ATTACHMENT, chat.members, {
+            message: messageForRealTime,
+            chatId
+        })
+        emitEvent(req, NEW_MESSAGE_ALERT, chat.members, { chatId })
+        res.status(200).json({
+            success: true,
+            message
+        })
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message,
+        })
+    }
+}
+
+export const getChatDetail = async (req, res) => {
+    try {
+        if (req.query.populate === "true") {
+            const chat = await Chat.findById(req.params.id).populate("members", "name avatar").lean();
+            if (!chat) throw new ApiError(404, "Chat is not found");
+
+            chat.members = chat.members.map(({ _id, name, avatar }) => ({
+                _id,
+                name,
+                avatar: avatar.url
+            }))
+            res.status(200).json({
+                success: true,
+                chat
+            })
+        } else {
+            const chat = await Chat.findById(req.params.id);
+            if (!chat) throw new ApiError(404, "Chat not found");
+            res.status(200).json({
+                success: true,
+                chat
+            })
+        }
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+export const renameGroup = async (req, res) => {
+    try {
+        const chatId = req.params.id;
+        const { name } = req.body;
+
+        const chat = await Chat.findById(chatId);
+
+        if (!chat) throw new ApiError(404, "Chat not found..");
+        if (!chat.groupChat) throw new ApiError(400, "This is not a group Chat..");
+        if (chat.creator.toString() !== req.user.toString()) throw new ApiError(403, "You are not allowed to rename the group");
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message,
         })
     }
 }
