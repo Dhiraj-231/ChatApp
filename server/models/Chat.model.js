@@ -10,13 +10,15 @@ const chatSchema = new Schema({
         default: false,
     },
     creator: {
-        type: mongoose.Types.ObjectId,
-        ref: "User"
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     },
-    members: [{
-        Type: mongoose.Types.ObjectId,
-        ref: "User"
-    }]
+    members: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "User"
+        }
+    ]
 },
     {
         timestamps: true
