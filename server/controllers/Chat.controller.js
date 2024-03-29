@@ -2,7 +2,7 @@ import { ALERT, NEW_ATTACHMENT, NEW_MESSAGE_ALERT, REFETCH_CHATS } from "../cons
 import { getOtherMember } from "../lib/helper.js";
 import { Chat } from "../models/Chat.model.js";
 import { ApiError } from "../utils/ApiError.js"
-import { emitEvent } from "../utils/feather.js";
+import { deleteFilesFromCloudinary, emitEvent } from "../utils/feather.js";
 import { User } from "../models/User.model.js";
 import { Message } from "../models/Message.model.js";
 export const newGroupChat = async (req, res) => {
@@ -262,10 +262,84 @@ export const renameGroup = async (req, res) => {
         if (!chat) throw new ApiError(404, "Chat not found..");
         if (!chat.groupChat) throw new ApiError(400, "This is not a group Chat..");
         if (chat.creator.toString() !== req.user.toString()) throw new ApiError(403, "You are not allowed to rename the group");
+        chat.name = name;
+        await chat.save();
+        emitEvent(req, REFETCH_CHATS, chat.members);
+        res.status(200).json({
+            success: true,
+            message: "Group renamed Successfully..."
+        })
     } catch (error) {
         res.status(400).json({
             success: false,
             message: error.message,
+        })
+    }
+}
+
+export const deleteChat = async (req, res) => {
+    try {
+        const chatId = req.params.id;
+        const chat = await Chat.findById(chatId);
+        if (!chat) throw new ApiError(404, "Chat not found..");
+        const members = chat.members;
+        if (chat.groupChat && chat.creator.toString() !== req.user.toString()) throw new ApiError(403, "You are not allowed to delete the group");
+        if (!chat.groupChat && !chat.members.includes(req.user.toString())) throw new ApiError(403, "You are not allowed to delete chat");
+        const messageWithAttachments = await Message.find({ chat: chatId, attachments: { $exists: true, $ne: [] } })
+        const public_ids = [];
+
+        messageWithAttachments.forEach(({ attachments }) => {
+            attachments.forEach(({ public_id }) => {
+                public_ids.push(public_id);
+            });
+        });
+
+        await Promise.all([
+            //DeleteFiles from Coudinary
+            deleteFilesFromCloudinary(public_ids),
+            chat.deleteOne(),
+            Message.deleteMany({ chat: chatId }),
+        ])
+        emitEvent(req, REFETCH_CHATS, members);
+
+        res.status(200).json({
+            succcess: true,
+            message: "Chat deleted successfully..."
+        })
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: "Okay..."
+        })
+    }
+}
+
+export const getMessages = async (req, res) => {
+    try {
+        const chatId = req.params.id;
+        const { page = 1, limit = 20 } = req.query;
+        const skip = (page - 1) * limit;
+
+        const [messages, totalMessagesCount] = await Promise.all([
+            Message.find({ chat: chatId })
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .populate("sender", "name")
+                .lean(),
+            Message.countDocuments({ chat: chatId }),
+        ]);
+
+        const totalPages = Math.ceil(totalMessagesCount / limit) || 0;
+        res.status(200).json({
+            succcess: true,
+            message: messages.reverse(),
+            totalPages
+        })
+    } catch (error) {
+        res.status(400).json({
+            succcess: false,
+            message: "Done bro"
         })
     }
 }
