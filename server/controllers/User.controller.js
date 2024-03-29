@@ -1,4 +1,5 @@
 import { User } from "../models/User.model.js";
+import { Chat } from "../models/Chat.model.js";
 import { ApiError } from "../utils/ApiError.js";
 
 export const Register = async (req, res) => {
@@ -85,9 +86,18 @@ export const logout = async (req, res) => {
 export const searchUser = async (req, res) => {
     try {
         const { name } = req.query;
+
+        const myChat = await Chat.find({ groupChat: false, members: req.user });
+        // get all Users from chats
+        const allUsersFromMyChat = myChat.flatMap((chat) => chat.members);
+        // get all Users from chats means friends or people i have chatted with
+        const allUsersExceptsMeAndFriends = await User.find({
+            _id: { $nin: allUsersFromMyChat },
+            name: { $regex: name, $options: "i" }
+        })
         res.status(200).json({
             success: true,
-            message: name
+            myChat
         })
     } catch (error) {
         res.status(400).json({

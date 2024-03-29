@@ -1,4 +1,4 @@
-import { body, validationResult } from "express-validator";
+import { body, validationResult, param, check } from "express-validator";
 export const validateRegisterInput = [
     // Checking if name is not empty
     body("name").notEmpty().withMessage("Name cannot be empty"),
@@ -35,7 +35,7 @@ export const validateRegisterInput = [
 export const validateLoginInput = [
     body("username")
         .notEmpty().withMessage("Username cannot be empty...")
-        .matches(/^[a-zA-Z0-9_]+$/).withMessage('Username can only contain letters, numbers, and underscores'),
+        .matches(/^[a-zA-Z0-9_.]+$/).withMessage('Username can only contain letters, numbers, and underscores'),
 
     body("password")
         .notEmpty().withMessage("Password cannot be empty..")
@@ -57,9 +57,112 @@ export const validateChatSchema = [
 
 
     // Check if members is an array of valid ObjectIds
-    body('members').isArray().withMessage('Members must be an array'),
+    body('members')
+        .notEmpty().withMessage("Members not be empty")
+        .isArray({ min: 2, max: 100 }).withMessage('Members must be an array'),
 
     // Check for errors
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
+]
+
+export const addMemberValidater = [
+    body("chatId").notEmpty().withMessage("Chat Id must not be empty.."),
+    body("members").isArray({ min: 1, max: 97 }).withMessage("Members must be a non-empty array"),
+    //checking for errors
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
+]
+
+export const removeMemberValidater = [
+    body("userId").notEmpty().withMessage("User Id must not be Empty.."),
+    body("chatId").notEmpty().withMessage("Chat Id must not be Empty.."),
+    //checking for Error
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
+]
+
+export const leaveGroupValidater = [
+    param("id").notEmpty().withMessage("Please Enter Chat ID"),
+    //CHECKING FOR ERRORR
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
+]
+
+export const sendAttachmentValidater = [
+    body("userId").notEmpty().withMessage("User Id must not be Empty.."),
+    check("files")
+        .notEmpty().withMessage("Please Upload Attachements")
+        .isArray({ min: 1, max: 5 }).withMessage('Attachements must be 1-5'),
+    //checking for Error
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
+]
+
+export const getMessageValidater = [
+    param("id").notEmpty().withMessage("Please Enter Chat ID"),
+    //checking for Error
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
+]
+export const getChatDetailValidater = [
+    param("id").notEmpty().withMessage("Please Enter Chat ID"),
+    //checking for Error
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
+]
+
+export const renameChatValidater = [
+    param("id").notEmpty().withMessage("Please Enter Chat ID"),
+    body("name").notEmpty().withMessage("Please enter the valid name"),
+    //checking for Error
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
+]
+
+export const deleteChatValidater = [
+    param("id").notEmpty().withMessage("Please Enter Chat ID"),
+    //checking for Error
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {

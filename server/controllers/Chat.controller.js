@@ -8,9 +8,6 @@ import { Message } from "../models/Message.model.js";
 export const newGroupChat = async (req, res) => {
     try {
         const { name, members } = req.body;
-
-        if (members.length < 2) throw new ApiError(400, "Group chat must have atLeast 2 member");
-        console.log(req.user)
         const allMembers = [...members, req.user];
         const chat = await Chat.create({
             name,
@@ -94,7 +91,6 @@ export const getMyGroups = async (req, res) => {
 export const addMembers = async (req, res) => {
     try {
         const { chatId, members } = req.body;
-        if (!members || members.length < 1) throw new ApiError(400, "Please provide members")
         const chat = await Chat.findById(chatId);
         if (!chat) throw new ApiError(404, "Chat not found");
         if (!chat.groupChat) throw new ApiError(400, "This is not group chat");

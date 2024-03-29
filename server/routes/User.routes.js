@@ -9,5 +9,5 @@ router.post("/register", validateRegisterInput, singleAvatar, Register);
 router.post("/login", validateLoginInput, login);
 router.get("/getMyDetail", isAuthenticated, getMyProfileDetail);
 router.get("/logout", isAuthenticated, logout);
-router.get("/search", searchUser);
+router.get("/search", isAuthenticated, searchUser);
 export default router;
