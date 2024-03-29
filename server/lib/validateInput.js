@@ -50,3 +50,21 @@ export const validateLoginInput = [
         next();
     }
 ]
+
+export const validateChatSchema = [
+    // Check if name is provided and is a string
+    body('name').isString().withMessage('Chat name must be a string'),
+
+
+    // Check if members is an array of valid ObjectIds
+    body('members').isArray().withMessage('Members must be an array'),
+
+    // Check for errors
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
+]
