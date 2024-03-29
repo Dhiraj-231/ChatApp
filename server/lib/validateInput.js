@@ -171,3 +171,29 @@ export const deleteChatValidater = [
         next();
     }
 ]
+
+export const sendRequestValidator = [
+    body('userId').notEmpty().withMessage("User Id must be provided"),
+    //checking for Error
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
+]
+export const acceptRequestValidator = [
+    body('requestId').notEmpty().withMessage("Request Id must be provided"),
+    body("accept")
+        .notEmpty().withMessage("Please add accept")
+        .isBoolean().withMessage("Accept must be a Boolean"),
+    //checking for Error
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
+]

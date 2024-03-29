@@ -1,7 +1,9 @@
-import { User } from "../models/User.model.js";
+import { NEW_FRIEND_REQUEST, REFETCH_CHATS } from "../constants/event.js";
 import { Chat } from "../models/Chat.model.js";
+import { Request } from "../models/Request.model.js";
+import { User } from "../models/User.model.js";
 import { ApiError } from "../utils/ApiError.js";
-
+import { emitEvent } from "../utils/feather.js";
 export const Register = async (req, res) => {
     try {
         const { name, username, password, avatar } = req.body;
@@ -95,9 +97,86 @@ export const searchUser = async (req, res) => {
             _id: { $nin: allUsersFromMyChat },
             name: { $regex: name, $options: "i" }
         })
+        const users = allUsersExceptsMeAndFriends.map(({ _id, name, avatar }) => (
+            {
+                _id,
+                name,
+                avatar: avatar.url
+            }
+        )
+        )
         res.status(200).json({
             success: true,
-            myChat
+            users
+        })
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+export const sendFriendRequest = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        if (userId.toString() === req.user.toString()) throw new ApiError(400, "This Action is not allowed..")
+        const request = await Request.findOne({
+            $or: [
+                { sender: req.user, receiver: userId },
+                { sender: userId, receiver: req.user }
+            ]
+        });
+        if (request) throw new ApiError(404, "Request already sent");
+
+        await Request.create({
+            sender: req.user,
+            receiver: userId
+        });
+
+        emitEvent(req, NEW_FRIEND_REQUEST, [userId]);
+
+        res.status(200).json({
+            success: true,
+            message: "Friend request Sent.."
+        })
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message,
+        })
+    }
+}
+
+export const acceptFriendRequest = async (req, res) => {
+    try {
+        const { requestId, accept } = req.body;
+
+        const request = await Request.findById(requestId)
+            .populate("sender", "name")
+            .populate("recevier", "name")
+        if (!request) throw new ApiError(404, "Request not found");
+        if (request.receiver.toString() !== req.user.toString()) throw new ApiError(401, "UnAuthorized..");
+        if (!accept) {
+            await request.deleteOne();
+            res.status(200).json({
+                success: true,
+                message: "Friend request rejected.."
+            })
+        }
+        const members = [request.sender._id, request.receiver._id];
+        await Promise.all([Chat.create({
+            members,
+            name: `${request.sender.name}-${request.receiver.name}`
+        }),
+        request.deleteOne()
+        ]);
+
+        emitEvent(req, REFETCH_CHATS, members);
+
+        res.status(200).json({
+            success: true,
+            message: "Friend Request Accepted",
+            senderId: request.sender._id,
         })
     } catch (error) {
         res.status(400).json({
