@@ -1,6 +1,9 @@
 import express from "express";
 import {
     Register,
+    acceptFriendRequest,
+    getMyFriends,
+    getMyNotification,
     getMyProfileDetail,
     login,
     logout,
@@ -23,5 +26,7 @@ router.get("/getMyDetail", isAuthenticated, getMyProfileDetail);
 router.get("/logout", isAuthenticated, logout);
 router.get("/search", isAuthenticated, searchUser);
 router.put("/sendrequest", sendRequestValidator, isAuthenticated, sendFriendRequest);
-router.put("/acceptRequest", acceptRequestValidator, isAuthenticated, sendFriendRequest);
+router.put("/acceptRequest", acceptRequestValidator, isAuthenticated, acceptFriendRequest);
+router.get("/notifications", isAuthenticated, getMyNotification);
+router.get("/friends", isAuthenticated, getMyFriends);
 export default router;

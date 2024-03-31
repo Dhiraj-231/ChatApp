@@ -69,7 +69,7 @@ export const getMyGroups = async (req, res) => {
             members: req.user,
             groupChat: true,
             creator: req.user
-        }).populate("members", "name avatar").select("-_id")
+        }).populate("members", "name avatar").select("-_id");
         const groups = chats.map(({ members, _id, groupChat, name }) => ({
             _id,
             groupChat,

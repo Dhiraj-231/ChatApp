@@ -1,4 +1,5 @@
 import { NEW_FRIEND_REQUEST, REFETCH_CHATS } from "../constants/event.js";
+import { getOtherMember } from "../lib/helper.js";
 import { Chat } from "../models/Chat.model.js";
 import { Request } from "../models/Request.model.js";
 import { User } from "../models/User.model.js";
@@ -151,11 +152,16 @@ export const acceptFriendRequest = async (req, res) => {
     try {
         const { requestId, accept } = req.body;
 
-        const request = await Request.findById(requestId)
-            .populate("sender", "name")
-            .populate("recevier", "name")
+        const request = await Request.findById(requestId).populate([
+            {
+                path: "sender", select: "name"
+            },
+            {
+                path: "receiver", select: "name"
+            }
+        ]);
         if (!request) throw new ApiError(404, "Request not found");
-        if (request.receiver.toString() !== req.user.toString()) throw new ApiError(401, "UnAuthorized..");
+        if (request.receiver._id.toString() !== req.user.toString()) throw new ApiError(401, "UnAuthorized..");
         if (!accept) {
             await request.deleteOne();
             res.status(200).json({
@@ -164,24 +170,87 @@ export const acceptFriendRequest = async (req, res) => {
             })
         }
         const members = [request.sender._id, request.receiver._id];
-        await Promise.all([Chat.create({
+        const chatName = await Promise.all([Chat.create({
             members,
             name: `${request.sender.name}-${request.receiver.name}`
         }),
         request.deleteOne()
         ]);
 
-        emitEvent(req, REFETCH_CHATS, members);
+        emitEvent(req, REFETCH_CHATS, "members");
 
         res.status(200).json({
             success: true,
             message: "Friend Request Accepted",
-            senderId: request.sender._id,
+            senderId: request.sender.name,
+            chatName
         })
     } catch (error) {
         res.status(400).json({
             success: false,
             message: error.message
+        })
+    }
+}
+export const getMyNotification = async (req, res) => {
+    try {
+        const request = await Request.find({ receiver: req.user }).populate("sender", "name avatar");
+        const allRequests = request.map(({ _id, sender }) => ({
+            _id,
+            sender: {
+                _id: sender._id,
+                name: sender.name,
+                avatar: sender.avatar.url,
+            }
+        }));
+
+        res.status(200).json({
+            success: true,
+            allRequests,
+        })
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message,
+        })
+    }
+}
+
+export const getMyFriends = async (req, res) => {
+    try {
+        const chatId = req.query.chatId;
+        const chats = await Chat.find({
+            members: req.user,
+            groupChat: false,
+        }).populate([
+            { path: "members", select: "name avatar" }
+        ]);
+        const friendList = await Promise.all(chats.map(async ({ members }) => {
+            const otherUser = await getOtherMember(members, req.user);
+            return {
+                _id: otherUser._id,
+                name: otherUser.name,
+                avatar: otherUser.avatar.url
+            };
+        }));
+        if (chatId) {
+            const chat = await Chat.findById(chatId);
+            const availableFriends = friendList.filter(friend => !chat.members.includes(friend._id));
+            return res.status(200).json({
+                success: true,
+                friends: availableFriends
+            })
+        } else {
+            return res.status(200).json({
+                success: true,
+                friends: friendList
+            })
+        }
+
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message,
         })
     }
 }

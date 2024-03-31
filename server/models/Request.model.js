@@ -14,7 +14,7 @@ const requestSchema = new Schema({
     },
     receiver: {
         type: mongoose.Types.ObjectId,
-        ref: "Chat",
+        ref: "User",
         required: true
     },
 }, {
