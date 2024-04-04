@@ -15,3 +15,21 @@ export const isAuthenticated = async (req, res, next) => {
         })
     }
 }
+
+export const adminOnly = async (req, res, next) => {
+    try {
+        const token = req.cookies?.["admin-token"];
+        if (!token) throw new ApiError(401, "Please login first as admin");
+        const adminId = jwt.verify(token, process.env.JWT_SECRET);
+        const adminSecretKey = process.env.ADMIN_SECRET_KEY || "DhirajRay";
+        const idMatched = adminSecretKey === adminId
+        if (!idMatched) throw new ApiError(401, "Please login first...");
+
+        next();
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message,
+        })
+    }
+}

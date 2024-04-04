@@ -1,4 +1,4 @@
-import { body, validationResult, param, check } from "express-validator";
+import { body, param, validationResult } from "express-validator";
 export const validateRegisterInput = [
     // Checking if name is not empty
     body("name").notEmpty().withMessage("Name cannot be empty"),
@@ -111,9 +111,6 @@ export const leaveGroupValidater = [
 
 export const sendAttachmentValidater = [
     body("userId").notEmpty().withMessage("User Id must not be Empty.."),
-    check("files")
-        .notEmpty().withMessage("Please Upload Attachements")
-        .isArray({ min: 1, max: 5 }).withMessage('Attachements must be 1-5'),
     //checking for Error
     (req, res, next) => {
         const errors = validationResult(req);
@@ -188,6 +185,18 @@ export const acceptRequestValidator = [
     body("accept")
         .notEmpty().withMessage("Please add accept")
         .isBoolean().withMessage("Accept must be a Boolean"),
+    //checking for Error
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
+]
+
+export const adminLoginValidater = [
+    body('secretKey').notEmpty().withMessage("Please enter the secret key"),
     //checking for Error
     (req, res, next) => {
         const errors = validationResult(req);

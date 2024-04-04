@@ -1,10 +1,10 @@
 import { ALERT, NEW_ATTACHMENT, NEW_MESSAGE_ALERT, REFETCH_CHATS } from "../constants/event.js";
 import { getOtherMember } from "../lib/helper.js";
 import { Chat } from "../models/Chat.model.js";
-import { ApiError } from "../utils/ApiError.js"
-import { deleteFilesFromCloudinary, emitEvent } from "../utils/feather.js";
-import { User } from "../models/User.model.js";
 import { Message } from "../models/Message.model.js";
+import { User } from "../models/User.model.js";
+import { ApiError } from "../utils/ApiError.js";
+import { deleteFilesFromCloudinary, emitEvent } from "../utils/feather.js";
 export const newGroupChat = async (req, res) => {
     try {
         const { name, members } = req.body;
@@ -190,7 +190,7 @@ export const sendAttachment = async (req, res) => {
         const [chat, me] = await Promise.all([Chat.findById(chatId), User.findById(req.user, "name")]);
         if (!chat) throw new ApiError(404, "Chat not found...");
         const files = req.files || [];
-        if (files.length < 1) throw new ApiError(400, "Please provide attachements");
+        if (files.length < 1 || files.length > 5) throw new ApiError(400, "Please provide attachements between 1 to 5");
         const attachments = [];
         const messageForRealTime = {
             content: "", attachments, sender: {

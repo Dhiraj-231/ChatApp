@@ -1,6 +1,8 @@
 import { Chat } from "../models/Chat.model.js";
 import { User } from "../models/User.model.js";
 import { Message } from "../models/Message.model.js";
+import { ApiError } from "../utils/ApiError.js";
+import jwt from "jsonwebtoken";
 export const getAllUsers = async (req, res) => {
     try {
         const users = await User.find({}).select("-password");
@@ -129,6 +131,11 @@ export const getDashBoardStats = async (req, res) => {
             }
         }).select("createdAt");
         const messages = new Array(7).fill(0);
+        last7DaysMessage.forEach(message => {
+            const indexApprox = (today.getTime() - message.createdAt.getTime()) / (1000 * 60 * 60 * 24);
+            const index = Math.floor(indexApprox);
+            messages[6 - index]++;
+        })
         const stats = {
             groupCount,
             usersCount,
@@ -139,6 +146,56 @@ export const getDashBoardStats = async (req, res) => {
         res.status(200).json({
             success: true,
             stats
+        })
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message,
+        })
+    }
+}
+
+export const adminLogin = async (req, res) => {
+    try {
+        const { secretKey } = req.body;
+        const adminSecretKey = process.env.ADMIN_SECRET_KEY || "DhirajRay";
+
+        const isMatched = secretKey === adminSecretKey;
+
+        if (!isMatched) throw new ApiError(401, "Invalid Admin Key..");
+
+        const token = jwt.sign(secretKey, process.env.JWT_SECRET);
+        return res.status(200).cookie("admin-token", token, { expires: new Date(Date.now() + 15 * 60 * 1000), httpOnly: true, secure: true }).json({
+            success: true,
+            message: "Admin Login successfully..."
+        })
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        })
+    }
+
+}
+
+export const adminLogOut = async (req, res) => {
+    try {
+        return res.status(200).cookie("admin-token", "", { expires: new Date(Date.now()), httpOnly: true, secure: true }).json({
+            success: true,
+            message: "Admin Logout successfully..."
+        })
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+export const getAdminData = async (req, res) => {
+    try {
+        res.status(200).json({
+            admin: true,
         })
     } catch (error) {
         res.status(400).json({

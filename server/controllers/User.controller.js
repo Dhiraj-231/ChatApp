@@ -49,6 +49,7 @@ export const login = async (req, res) => {
             message: `Welcome back ${(user.name).charAt(0).toUpperCase() + user.name.slice(1)}`
         })
     } catch (error) {
+        console.log(error)
         res.status(400).json({
             success: false,
             message: error.message
