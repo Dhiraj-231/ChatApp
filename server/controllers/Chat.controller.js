@@ -33,8 +33,8 @@ export const getMyChats = async (req, res) => {
     try {
         const chats = await Chat.find({ members: req.user }).populate({ path: "members", select: "name avatar" })
 
-        const transformChats = chats.map(({ _id, groupChat, members, name, lastMessage }) => {
-            const otherMember = getOtherMember(members, req.user);
+        const transformChats = chats.map(async ({ _id, groupChat, members, name, lastMessage }) => {
+            const otherMember = await getOtherMember(members, req.user);
             return {
                 _id,
                 groupChat,
@@ -48,6 +48,7 @@ export const getMyChats = async (req, res) => {
                     return prev;
                 }, []),
             }
+
         });
 
         res.status(200).json({

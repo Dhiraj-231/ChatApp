@@ -1,15 +1,19 @@
+import { Grid, Skeleton } from "@mui/material";
 import React from "react";
-import Header from "./Header";
-import Title from "../shared/Tittle";
-import { Grid } from "@mui/material";
-import ChatList from "../specfics/ChatList";
-import { sampleChats } from "../../constants/SampleData";
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { useMyChatQuery } from "../../redux/api/api.js";
+import Title from "../shared/Tittle";
+import ChatList from "../specfics/ChatList";
 import Profile from "../specfics/Profile";
+import Header from "./Header";
 const AppLayOut = () => (WrappedComponent) => {
   return (props) => {
     const params = useParams();
     const chatId = params.chatId;
+    const { isMobileMenuFriend } = useSelector((state) => state.misc);
+    const { isLoading, data, isError, error, refetch } = useMyChatQuery("");
+
     const handleDeleteChat = (e, _id, groupChat) => {
       e.preventDefault();
       console.log("Delete Chat", _id, groupChat);
@@ -28,11 +32,15 @@ const AppLayOut = () => (WrappedComponent) => {
             }}
             height={"100%"}
           >
-            <ChatList
-              chats={sampleChats}
-              chatId={chatId}
-              handleDeleteChat={handleDeleteChat}
-            />
+            {isLoading ? (
+              <Skeleton />
+            ) : (
+              <ChatList
+                chats={data?.chats}
+                chatId={chatId}
+                handleDeleteChat={handleDeleteChat}
+              />
+            )}
           </Grid>
           <Grid item xs={12} sm={8} md={5} lg={6} height={"100%"}>
             <WrappedComponent {...props} />

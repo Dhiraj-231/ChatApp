@@ -1,23 +1,28 @@
 import {
+  Add as AddIcon,
+  Group as GroupIcon,
+  Logout as LogoutIcon,
+  Menu as MenuIcon,
+  Notifications as NotificationIcon,
+  Search as SearchIcon,
+} from "@mui/icons-material";
+import {
   AppBar,
   Backdrop,
   Box,
   IconButton,
   Toolbar,
   Tooltip,
+  Typography,
 } from "@mui/material";
+import axios from "axios";
 import React, { Suspense, lazy, useState } from "react";
-import { orange } from "../../constants/Color";
-import { Typography } from "@mui/material";
-import {
-  Menu as MenuIcon,
-  Search as SearchIcon,
-  Add as AddIcon,
-  Group as GroupIcon,
-  Logout as LogoutIcon,
-  Notifications as NotificationIcon,
-} from "@mui/icons-material";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { orange } from "../../constants/Color";
+import { server } from "../../constants/config.js";
+import { userNotExist } from "../../redux/reducers/auth.js";
 const SearchDialog = lazy(() => import("../specfics/Search"));
 const NotificationDialog = lazy(() => import("../specfics/Notification"));
 const NewGroupDialog = lazy(() => import("../specfics/NewGroupDialog.jsx"));
@@ -27,6 +32,7 @@ const Header = () => {
   const [isSearch, setIsSearch] = useState(false);
   const [isNewGroup, setIsGroup] = useState(false);
   const [isNotification, setIsNotification] = useState(false);
+  const dispatch = useDispatch();
   const handleMobile = () => {
     setIsMobile((prev) => !prev);
   };
@@ -39,8 +45,16 @@ const Header = () => {
     console.log("Click on the group");
   };
   const navigateToGroup = () => navigate("/groups");
-  const logoutHandler = () => {
-    console.log("Logout");
+  const logoutHandler = async () => {
+    try {
+      const { data } = await axios.get(`${server}/api/v1/auth/logout`, {
+        withCredentials: true,
+      });
+      dispatch(userNotExist());
+      toast.success(data.message);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something went wrong..");
+    }
   };
   const openNotification = () => {
     setIsNotification((prev) => !prev);
