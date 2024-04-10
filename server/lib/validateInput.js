@@ -10,18 +10,6 @@ export const validateRegisterInput = [
     body("password")
         .notEmpty().withMessage("Password cannot be empty..")
         .isLength({ min: 6 }).withMessage("Password must be at least 6 characters long"),
-    // Check if avatar public_id is provided
-    body('avatar.public_id')
-        .optional()
-        .notEmpty()
-        .withMessage('Avatar public_id cannot be empty'),
-
-    // Check if avatar url is provided and is a valid URL
-    body('avatar.url')
-        .optional()
-        .notEmpty()
-        .isURL()
-        .withMessage('Avatar URL must be a valid URL'),
 
     (req, res, next) => {
         const errors = validationResult(req);

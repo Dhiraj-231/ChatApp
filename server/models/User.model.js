@@ -17,6 +17,10 @@ const userSchema = new Schema(
             require: [true, "Please provide username"],
             unique: true,
         },
+        bio: {
+            type: String,
+            required: true
+        },
         password: {
             type: String,
             required: true,

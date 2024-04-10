@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import { useFileHandler, useInputValidation, useStrongPassword } from "6pp";
+import { CameraAlt } from "@mui/icons-material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import {
   Avatar,
   Button,
@@ -10,13 +13,16 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { CameraAlt } from "@mui/icons-material";
+import axios from "axios";
+import React, { useState } from "react";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
 import { VisuallyHiddenInput } from "../components/Styles/StyleComponents";
-import { useFileHandler, useInputValidation, useStrongPassword } from "6pp";
-import { userNameValidator } from "../utils/Validators.js";
 import { bgGridents } from "../constants/Color.js";
+import { server } from "../constants/config.js";
+import { userExist } from "../redux/reducers/auth.js";
+import { userNameValidator } from "../utils/Validators.js";
+
 const Login = () => {
   const [isLogin, SetIsLogin] = useState(true);
   const name = useInputValidation("");
@@ -25,15 +31,65 @@ const Login = () => {
   const password = useStrongPassword();
   const avatar = useFileHandler("single");
   const [showPassword, setShowPassword] = useState(false);
-
+  const dispatch = useDispatch();
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
+    const config = {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    };
+
+    const form = {
+      name: name.value,
+      username: username.value,
+      password: password.value,
+      bio: bio.value,
+      avatar: avatar.file,
+    };
+
+    try {
+      const { data } = await axios.post(
+        `${server}/api/v1/auth/register`,
+        form,
+        config
+      );
+      console.log("Hii");
+      dispatch(userExist(true));
+      toast.success(data.message);
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message ||
+          "Something went wrong please try after sometime"
+      );
+    }
   };
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    const config = {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    try {
+      const { data } = await axios.post(
+        `${server}/api/v1/auth/login`,
+        {
+          username: username.value,
+          password: password.value,
+        },
+        config
+      );
+      dispatch(userExist(true));
+      toast.success(data.message);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something went wrong");
+    }
   };
   return (
     <div
@@ -119,7 +175,9 @@ const Login = () => {
                 <Button
                   fullWidth
                   variant="text"
-                  onClick={() => SetIsLogin(false)}
+                  onClick={() => {
+                    SetIsLogin(false);
+                  }}
                 >
                   Register
                 </Button>
