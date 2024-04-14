@@ -12,11 +12,13 @@ import Title from "../shared/Tittle";
 import ChatList from "../specfics/ChatList";
 import Profile from "../specfics/Profile";
 import Header from "./Header";
+import { getSocket } from "../../socket.jsx";
 const AppLayOut = () => (WrappedComponent) => {
   return (props) => {
     const params = useParams();
     const chatId = params.chatId;
     const deleteMenuAnchor = useRef(null);
+    const socket = getSocket();
     const dispatch = useDispatch();
     const { isMobileMenuFriend } = useSelector((state) => state.misc);
     const { user } = useSelector((state) => state.auth);

@@ -5,6 +5,8 @@ import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/event.js";
 import { v4 as uuid } from "uuid";
 import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/Message.model.js";
+import cookieParser from "cookie-parser";
+import { socketAuthenticator } from "./middlewares/auth.js";
 dotenv.config({ path: './configs/.env' });
 dbConnection();
 
@@ -13,14 +15,12 @@ export const userSocketIds = new Map()
 app.get("/", (req, res) => {
     res.send("<h2>Hii, there </h2>");
 });
-io.use((socket, next) => { })
+io.use((socket, next) => {
+    cookieParser()(socket.request, socket.request.res, async (err) => await socketAuthenticator(err, socket, next))
+});
 io.on("connection", (socket) => {
-    const user = {
-        _id: "Assade",
-        name: "assade"
-    }
+    const user = socket.user;
     userSocketIds.set(user._id.toString(), socket.id);
-    console.log(userSocketIds);
 
     socket.on(NEW_MESSAGE, async ({ chatId, members, messages }) => {
         const messagesForRealTime = {

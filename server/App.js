@@ -8,10 +8,11 @@ import AdminRouter from "./routes/Admin.routes.js"
 import dotenv from "dotenv";
 import { Server } from "socket.io";
 import { v2 as cloudinary } from "cloudinary";
+import { corsOption } from "./constants/configs.js";
 dotenv.config({ "path": "./configs/.env" })
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {});
+const io = new Server(server, { cors: corsOption });
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_NAME,
@@ -19,10 +20,7 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
-app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:4173"],
-    credentials: true,
-}));
+app.use(cors(corsOption));
 app.use(express.json({ limit: "50Mb" }));
 app.use(express.urlencoded({ extended: true, limit: '50Mb' }));
 app.use(cookieParser());

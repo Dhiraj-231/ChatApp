@@ -1,4 +1,4 @@
-import React, { Fragment, useRef } from "react";
+import React, { Fragment, useRef, useState } from "react";
 import AppLayOut from "../components/layouts/AppLayOut";
 import { IconButton, Stack } from "@mui/material";
 import { grayColor, orange } from "../constants/Color";
@@ -10,12 +10,19 @@ import { InputBox } from "../components/Styles/StyleComponents";
 import FileMenu from "../dialogs/FileMenu";
 import { SampleMessage } from "../constants/SampleData";
 import MessageComponent from "../components/shared/MessageComponent";
+import { getSocket } from "../socket";
 const user = {
   _id: "assds",
   name: "Dhiraj",
 };
 const Chat = () => {
   const containerRef = useRef(null);
+  const socket = getSocket();
+  const [message, setMessage] = useState("");
+  const submitHandler = (e) => {
+    e.preventDefault();
+    console.log(message);
+  };
   return (
     <Fragment>
       <Stack
@@ -35,6 +42,7 @@ const Chat = () => {
         style={{
           height: "10%",
         }}
+        onSubmit={submitHandler}
       >
         <Stack
           direction={"row"}
@@ -52,7 +60,11 @@ const Chat = () => {
           >
             <AttachFileIcon />
           </IconButton>
-          <InputBox placeholder="Type Message Here...." />
+          <InputBox
+            placeholder="Type Message Here...."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
           <IconButton
             type="submit"
             sx={{
