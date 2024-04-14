@@ -25,15 +25,16 @@ import { server } from "../../constants/config.js";
 import { userNotExist } from "../../redux/reducers/auth.js";
 import {
   setIsMobileMenuFriend,
+  setIsNotification,
   setIsSearch,
 } from "../../redux/reducers/misc.js";
 const SearchDialog = lazy(() => import("../specfics/Search"));
 const NotificationDialog = lazy(() => import("../specfics/Notification"));
 const NewGroupDialog = lazy(() => import("../specfics/NewGroupDialog.jsx"));
 const Header = () => {
+  const { isNotification } = useSelector((state) => state.misc);
   const navigate = useNavigate();
   const [isNewGroup, setIsGroup] = useState(false);
-  const [isNotification, setIsNotification] = useState(false);
   const dispatch = useDispatch();
   const { isSearch } = useSelector((state) => state.misc);
   const handleMobile = () => dispatch(setIsMobileMenuFriend(true));
@@ -56,9 +57,7 @@ const Header = () => {
       toast.error(error?.response?.data?.message || "Something went wrong..");
     }
   };
-  const openNotification = () => {
-    setIsNotification((prev) => !prev);
-  };
+  const openNotification = () => dispatch(setIsNotification(true));
   return (
     <>
       <Box sx={{ flexGrow: 1 }} height={"4rem"}>

@@ -19,6 +19,7 @@ const AppLayOut = () => (WrappedComponent) => {
     const deleteMenuAnchor = useRef(null);
     const dispatch = useDispatch();
     const { isMobileMenuFriend } = useSelector((state) => state.misc);
+    const { user } = useSelector((state) => state.auth);
     const { isLoading, data, isError, error, refetch } = useMyChatQuery("");
 
     useError[{ isError, error }];
@@ -79,7 +80,7 @@ const AppLayOut = () => (WrappedComponent) => {
               bgcolor: "rgba(0,0,0,0.85)",
             }}
           >
-            <Profile />
+            <Profile user={user} />
           </Grid>
         </Grid>
       </>

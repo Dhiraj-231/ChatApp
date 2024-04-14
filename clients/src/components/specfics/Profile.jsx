@@ -6,10 +6,12 @@ import {
 import { Avatar, Stack, Typography } from "@mui/material";
 import moment from "moment";
 import React from "react";
-const Profile = () => {
+import { TransformImage } from "../../lib/feather";
+const Profile = ({ user }) => {
   return (
     <Stack spacing={"2rem"} direction={"column"} alignItems={"center"}>
       <Avatar
+        src={TransformImage(user?.avatar?.url)}
         sx={{
           width: 200,
           height: 200,
@@ -18,16 +20,16 @@ const Profile = () => {
           border: "5px solid white",
         }}
       />
-      <ProfileCard heading={"bio"} text={"sadasse"} />
+      <ProfileCard heading={"bio"} text={user?.bio} />
       <ProfileCard
         heading={"Username"}
-        text={"@dhirajRay"}
+        text={user?.username}
         Icon={<UserNameIcon />}
       />
-      <ProfileCard heading={"Name"} text={"Dhiraj"} Icon={<FaceIcon />} />
+      <ProfileCard heading={"Name"} text={user?.name} Icon={<FaceIcon />} />
       <ProfileCard
         heading={"Joined"}
-        text={moment("2024-03-19T11:25:36.074Z").fromNow()}
+        text={moment(user?.createdAt).fromNow()}
         Icon={<CalendarIcon />}
       />
     </Stack>
