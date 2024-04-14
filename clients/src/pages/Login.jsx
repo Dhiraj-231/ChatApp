@@ -58,7 +58,6 @@ const Login = () => {
         form,
         config
       );
-      console.log("Hii");
       dispatch(userExist(true));
       toast.success(data.message);
     } catch (error) {

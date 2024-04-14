@@ -9,7 +9,6 @@ export const Register = async (req, res) => {
     try {
         const { name, username, password, bio } = req.body;
         const file = req.file;
-        console.log(file);
         if (!file) throw new ApiError(400, "Please upload avatar");
         let user = await User.findOne({
             $or: [{ username }],
@@ -123,7 +122,7 @@ export const logout = async (req, res) => {
 
 export const searchUser = async (req, res) => {
     try {
-        const { name } = req.query;
+        const { name="" } = req.query;
 
         const myChat = await Chat.find({ groupChat: false, members: req.user });
         // get all Users from chats

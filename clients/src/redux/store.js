@@ -8,7 +8,7 @@ const store = configureStore({
         [miscSlice.name]: miscSlice.reducer,
         [api.reducerPath]: api.reducer,
     },
-    middleware: (middle) => [...middle(), api.middleware],
+    middleware: (middle) => [...middle(), api.middleware]
 });
 
 

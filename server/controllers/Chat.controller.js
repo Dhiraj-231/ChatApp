@@ -31,30 +31,32 @@ export const newGroupChat = async (req, res) => {
 
 export const getMyChats = async (req, res) => {
     try {
-        const chats = await Chat.find({ members: req.user }).populate({ path: "members", select: "name avatar" })
+        const chats = await Chat.find({ members: req.user }).populate(
+            "members",
+            "name avatar"
+        );
 
-        const transformChats = chats.map(async ({ _id, groupChat, members, name, lastMessage }) => {
+        const transformedChats = await Promise.all(chats.map(async ({ _id, name, members, groupChat }) => {
             const otherMember = await getOtherMember(members, req.user);
             return {
                 _id,
                 groupChat,
-                avatar: groupChat ? members.slice(0, 3).map(({ avatar }) => avatar.url) : [otherMember.avatar.url],
+                avatar: groupChat
+                    ? members.slice(0, 3).map(({ avatar }) => avatar.url)
+                    : [otherMember.avatar.url],
                 name: groupChat ? name : otherMember.name,
                 members: members.reduce((prev, curr) => {
                     if (curr._id.toString() !== req.user.toString()) {
                         prev.push(curr._id);
                     }
-
                     return prev;
                 }, []),
-            }
-
-        });
-
+            };
+        }));
         res.status(200).json({
             success: true,
-            chats: transformChats
-        })
+            chats: transformedChats,
+        });
     } catch (error) {
         res.status(400).json({
             success: false,
