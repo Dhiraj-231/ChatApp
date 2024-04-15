@@ -50,6 +50,6 @@ export const socketAuthenticator = async (err, socket, next) => {
         next();
     } catch (error) {
         console.log("Authentication error:", error.message);
-        // return next(new ApiError("Authentication error"));
+        return next(new ApiError("Authentication error"));
     }
 }

@@ -25,10 +25,11 @@ io.use((socket, next) => {
 io.on("connection", (socket) => {
     const user = socket.user;
     userSocketIds.set(user._id.toString(), socket.id);
+    console.log("Connected Successfully", user.name);
 
     socket.on(NEW_MESSAGE, async ({ chatId, members, messages }) => {
         const messagesForRealTime = {
-            content: message,
+            content: messages,
             _id: uuid(),
             sender: {
                 _id: user._id,
@@ -43,7 +44,6 @@ io.on("connection", (socket) => {
             sender: user._id,
             chatId: chatId,
         };
-
         const membersSockets = getSockets(members);
         io.to(membersSockets).emit(NEW_MESSAGE, {
             chatId,
@@ -56,7 +56,6 @@ io.on("connection", (socket) => {
             console.error("Error saving message to database:", error);
         }
     });
-
     socket.on("disconnect", () => {
         console.log("User disconnected:", user.name);
         userSocketIds.delete(user._id.toString());

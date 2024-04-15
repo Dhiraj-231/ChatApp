@@ -73,7 +73,7 @@ const AppLayOut = () => (WrappedComponent) => {
           </Grid>
           <Grid
             item
-            md={5}
+            md={4}
             lg={3}
             height={"100%"}
             sx={{
