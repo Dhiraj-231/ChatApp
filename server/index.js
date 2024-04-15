@@ -7,16 +7,20 @@ import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/Message.model.js";
 import cookieParser from "cookie-parser";
 import { socketAuthenticator } from "./middlewares/auth.js";
-dotenv.config({ path: './configs/.env' });
+dotenv.config({ path: "./configs/.env" });
 dbConnection();
 
-export const userSocketIds = new Map()
+export const userSocketIds = new Map();
 
 app.get("/", (req, res) => {
     res.send("<h2>Hii, there </h2>");
 });
 io.use((socket, next) => {
-    cookieParser()(socket.request, socket.request.res, async (err) => await socketAuthenticator(err, socket, next))
+    cookieParser()(
+        socket.request,
+        socket.request.res,
+        async (err) => await socketAuthenticator(err, socket, next)
+    );
 });
 io.on("connection", (socket) => {
     const user = socket.user;
@@ -24,7 +28,7 @@ io.on("connection", (socket) => {
 
     socket.on(NEW_MESSAGE, async ({ chatId, members, messages }) => {
         const messagesForRealTime = {
-            content: messages,
+            content: message,
             _id: uuid(),
             sender: {
                 _id: user._id,
@@ -32,27 +36,32 @@ io.on("connection", (socket) => {
             },
             chat: chatId,
             createdAt: new Date().toISOString(),
-        }
+        };
 
         const messageForDB = {
-            content: messages,
+            content: message,
             sender: user._id,
             chatId: chatId,
-        }
+        };
 
-        const membersSockets = getSockets(members)
+        const membersSockets = getSockets(members);
         io.to(membersSockets).emit(NEW_MESSAGE, {
             chatId,
-            messages: messagesForRealTime,
+            message: messagesForRealTime,
         });
         io.to(membersSockets).emit(NEW_MESSAGE_ALERT, { chatId });
-        await Message.create(messageForDB);
+        try {
+            await Message.create(messageForDB);
+        } catch (error) {
+            console.error("Error saving message to database:", error);
+        }
     });
-    socket.on('disconnect', () => {
-        console.log("user is disconnected..");
+
+    socket.on("disconnect", () => {
+        console.log("User disconnected:", user.name);
         userSocketIds.delete(user._id.toString());
-    })
-})
+    });
+});
 server.listen(process.env.PORT || 8500, () => {
     console.log(`Server is Started At port :${process.env.PORT || 8000}`);
-})
+});

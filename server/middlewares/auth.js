@@ -37,14 +37,19 @@ export const adminOnly = async (req, res, next) => {
 
 export const socketAuthenticator = async (err, socket, next) => {
     try {
-        if (err) throw new ApiError(err)
         const authToken = socket?.request?.cookies?.token;
-        if (!authToken) throw new ApiError(401, "Please login ...");
+        if (!authToken) throw new ApiError("No auth token found");
+
         const decode = jwt.verify(authToken, process.env.JWT_SECRET);
-        socket.user = await User.findById(decode._id).select("-password");
-        return next();
+        if (!decode?._id) throw new ApiError("Invalid token");
+
+        const user = await User.findById(decode._id).select("-password");
+        if (!user) throw new ApiError("User not found");
+
+        socket.user = user;
+        next();
     } catch (error) {
-        console.log(error)
-        throw new ApiError(401, "Please login to access this routes")
+        console.log("Authentication error:", error.message);
+        // return next(new ApiError("Authentication error"));
     }
 }

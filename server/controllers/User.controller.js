@@ -122,7 +122,7 @@ export const logout = async (req, res) => {
 
 export const searchUser = async (req, res) => {
     try {
-        const { name="" } = req.query;
+        const { name = "" } = req.query;
 
         const myChat = await Chat.find({ groupChat: false, members: req.user });
         // get all Users from chats
