@@ -98,7 +98,7 @@ export const leaveGroupValidater = [
 ]
 
 export const sendAttachmentValidater = [
-    body("userId").notEmpty().withMessage("User Id must not be Empty.."),
+    body("chatId").notEmpty().withMessage("chatId must not be Empty.."),
     //checking for Error
     (req, res, next) => {
         const errors = validationResult(req);

@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 import React, { memo } from "react";
 import { lightBlue } from "../../constants/Color";
 import moment from "moment";
-import { fileFormat } from "../../lib/feather";
+import { TransformImage, fileFormat } from "../../lib/feather";
 import ReanderAttach from "./ReanderAttach";
 
 const MessageComponent = ({ message, user }) => {
@@ -28,7 +28,7 @@ const MessageComponent = ({ message, user }) => {
       {content && <Typography>{content}</Typography>}
       {attachments.length > 0 &&
         attachments.map((attachment, index) => {
-          const url = attachment.url;
+          const url = TransformImage(attachment.url);
           const file = fileFormat(url);
 
           return (

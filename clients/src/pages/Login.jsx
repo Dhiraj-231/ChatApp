@@ -44,18 +44,17 @@ const Login = () => {
       },
     };
 
-    const form = {
-      name: name.value,
-      username: username.value,
-      password: password.value,
-      bio: bio.value,
-      avatar: avatar.file,
-    };
+    const formData = new FormData();
+    formData.append("avatar", avatar.file);
+    formData.append("name", name.value);
+    formData.append("bio", bio.value);
+    formData.append("username", username.value);
+    formData.append("password", password.value);
 
     try {
       const { data } = await axios.post(
         `${server}/api/v1/auth/register`,
-        form,
+        formData,
         config
       );
       dispatch(userExist(true));

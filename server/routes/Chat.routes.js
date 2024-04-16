@@ -34,7 +34,7 @@ router.get("/my/group", isAuthenticated, getMyGroups);
 router.put("/addMembers", addMemberValidater, isAuthenticated, addMembers);
 router.put("/removeMembers", removeMemberValidater, isAuthenticated, removeMembers);
 router.delete("/leave/:id", leaveGroupValidater, isAuthenticated, leaveGroup);
-router.post("/message", sendAttachmentValidater, isAuthenticated, attachmentsMulter, sendAttachment);
+router.post("/message", isAuthenticated, attachmentsMulter, sendAttachmentValidater, sendAttachment);
 router.get("/message/:id", getMessageValidater, isAuthenticated, getMessages);
 router.get("/:id", getChatDetailValidater, isAuthenticated, getChatDetail);
 router.put("/:id", renameChatValidater, isAuthenticated, renameGroup);

@@ -4,7 +4,7 @@ import { Chat } from "../models/Chat.model.js";
 import { Message } from "../models/Message.model.js";
 import { User } from "../models/User.model.js";
 import { ApiError } from "../utils/ApiError.js";
-import { deleteFilesFromCloudinary, emitEvent } from "../utils/feather.js";
+import { deleteFilesFromCloudinary, emitEvent, uploadFileToCloudinary } from "../utils/feather.js";
 export const newGroupChat = async (req, res) => {
     try {
         const { name, members } = req.body;
@@ -194,7 +194,7 @@ export const sendAttachment = async (req, res) => {
         if (!chat) throw new ApiError(404, "Chat not found...");
         const files = req.files || [];
         if (files.length < 1 || files.length > 5) throw new ApiError(400, "Please provide attachements between 1 to 5");
-        const attachments = [];
+        const attachments = await uploadFileToCloudinary(files);
         const messageForRealTime = {
             content: "", attachments, sender: {
                 _id: me._id,
