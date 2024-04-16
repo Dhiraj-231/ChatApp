@@ -316,20 +316,21 @@ export const deleteChat = async (req, res) => {
 export const getMessages = async (req, res) => {
     try {
         const chatId = req.params.id;
-        const { page = 1, limit = 20 } = req.query;
-        const skip = (page - 1) * limit;
+        const { page = 1 } = req.query;
+        const resultPerPages = 20;
+        const skip = (page - 1) * resultPerPages;
 
         const [messages, totalMessagesCount] = await Promise.all([
             Message.find({ chat: chatId })
                 .sort({ createdAt: -1 })
                 .skip(skip)
-                .limit(limit)
+                .limit(resultPerPages)
                 .populate("sender", "name")
                 .lean(),
             Message.countDocuments({ chat: chatId }),
         ]);
 
-        const totalPages = Math.ceil(totalMessagesCount / limit) || 0;
+        const totalPages = Math.ceil(totalMessagesCount / resultPerPages) || 0;
         res.status(200).json({
             succcess: true,
             message: messages.reverse(),
@@ -338,7 +339,7 @@ export const getMessages = async (req, res) => {
     } catch (error) {
         res.status(400).json({
             succcess: false,
-            message: "Done bro"
+            message: error.message
         })
     }
 }

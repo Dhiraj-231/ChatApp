@@ -8,6 +8,7 @@ import moment from "moment";
 import React from "react";
 import { TransformImage } from "../../lib/feather";
 const Profile = ({ user }) => {
+
   return (
     <Stack spacing={"2rem"} direction={"column"} alignItems={"center"}>
       <Avatar

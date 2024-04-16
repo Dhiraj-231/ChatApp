@@ -7,6 +7,7 @@ import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/Message.model.js";
 import cookieParser from "cookie-parser";
 import { socketAuthenticator } from "./middlewares/auth.js";
+import { ApiError } from "./utils/ApiError.js";
 dotenv.config({ path: "./configs/.env" });
 dbConnection();
 
@@ -38,11 +39,10 @@ io.on("connection", (socket) => {
             chat: chatId,
             createdAt: new Date().toISOString(),
         };
-
         const messageForDB = {
-            content: message,
+            content: messages,
             sender: user._id,
-            chatId: chatId,
+            chat: chatId,
         };
         const membersSockets = getSockets(members);
         io.to(membersSockets).emit(NEW_MESSAGE, {
@@ -53,7 +53,7 @@ io.on("connection", (socket) => {
         try {
             await Message.create(messageForDB);
         } catch (error) {
-            console.error("Error saving message to database:", error);
+            throw new ApiError(400, "Error in saving message", error.message)
         }
     });
     socket.on("disconnect", () => {

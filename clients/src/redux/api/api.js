@@ -1,53 +1,80 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
-import { server } from "../../constants/config.js"
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { server } from "../../constants/config.js";
 
 const api = createApi({
-    reducerPath: 'api',
+    reducerPath: "api",
     baseQuery: fetchBaseQuery({ baseUrl: `${server}/api/v1/` }),
-    tagTypes: ["Chat", "User"],
+    tagTypes: ["Chat", "User", "Message"],
     endpoints: (builder) => ({
         myChat: builder.query({
             query: () => ({
                 url: "chat/my",
-                credentials: 'include'
+                credentials: "include",
             }),
-            providesTags: ['Chat']
+            providesTags: ["Chat"],
         }),
 
         searchUser: builder.query({
             query: (name) => ({
                 url: `auth/search?name=${name}`,
-                credentials: 'include'
+                credentials: "include",
             }),
-            providesTags: ["User"]
+            providesTags: ["User"],
         }),
         sendFriendRequest: builder.mutation({
             query: (data) => ({
                 url: "auth/sendrequest",
                 method: "PUT",
-                credentials: 'include',
+                credentials: "include",
                 body: data,
             }),
-            invalidatesTags: ["User"]
+            invalidatesTags: ["User"],
         }),
         getNotifications: builder.query({
             query: () => ({
                 url: `auth/notifications`,
-                credentials: 'include'
+                credentials: "include",
             }),
-            keepUnusedDataFor: 0
+            keepUnusedDataFor: 0,
         }),
         acceptFriendRequest: builder.mutation({
             query: (data) => ({
                 url: "auth/acceptRequest",
                 method: "PUT",
-                credentials: 'include',
+                credentials: "include",
                 body: data,
             }),
-            invalidatesTags: ["Chat"]
+            invalidatesTags: ["Chat"],
         }),
-    })
+
+        chatDetails: builder.query({
+            query: (chatId, populate = false) => {
+                let url = `chat/${chatId.chatId}`;
+                if (populate) url += "?populate=true";
+                return {
+                    url,
+                    credentials: "include",
+                };
+            },
+            providesTags: ["Chat"],
+        }),
+        getMessages: builder.query({
+            query: (chatId, page = false) => ({
+                url: `chat/message/${chatId.chatId}?page=${page.page}`,
+                credentials: "include",
+            }),
+            providesTags: ["Message"],
+        }),
+    }),
 });
 
 export default api;
-export const { useMyChatQuery, useLazySearchUserQuery, useSendFriendRequestMutation, useGetNotificationsQuery, useAcceptFriendRequestMutation } = api;
+export const {
+    useMyChatQuery,
+    useLazySearchUserQuery,
+    useSendFriendRequestMutation,
+    useGetNotificationsQuery,
+    useAcceptFriendRequestMutation,
+    useChatDetailsQuery,
+    useGetMessagesQuery,
+} = api;

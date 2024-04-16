@@ -85,7 +85,7 @@ export const login = async (req, res) => {
 export const getMyProfileDetail = async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.user }).select(
-            "-password -createdAt -updatedAt -__v"
+            "-password -updatedAt -__v"
         );
         res.status(200).json({
             success: true,

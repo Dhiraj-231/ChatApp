@@ -45,7 +45,6 @@ export const socketAuthenticator = async (err, socket, next) => {
 
         const user = await User.findById(decode._id).select("-password");
         if (!user) throw new ApiError("User not found");
-
         socket.user = user;
         next();
     } catch (error) {
