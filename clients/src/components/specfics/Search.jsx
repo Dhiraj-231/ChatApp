@@ -17,19 +17,42 @@ import {
 } from "../../redux/api/api";
 import { setIsSearch } from "../../redux/reducers/misc";
 import UserItem from "../shared/UserItem";
+/**
+ * Search component for finding and adding friends
+ */
 const Search = () => {
+  // Redux store dispatch function
   const dispatch = useDispatch();
+  // Search input state and change handler
   const search = useInputValidation("");
+  // Whether search modal is open or not
   const { isSearch } = useSelector((state) => state.misc);
+  // Lazy query for searching users
   const [searchUser] = useLazySearchUserQuery();
+  // Mutation for sending friend request
   const [sendFriendRequest, isLoading] = useAsyncMutation(
     useSendFriendRequestMutation
   );
+  // State for holding search results
   const [users, setUsers] = useState([]);
+
+  /**
+   * Add friend handler
+   * @param {string} id User ID of friend to add
+   */
   const addFriendHandler = async (id) => {
     await sendFriendRequest("Sending friend Request...", { userId: id });
   };
+
+  /**
+   * Close search modal handler
+   */
   const searchCloseHandler = () => dispatch(setIsSearch(false));
+
+  /**
+   * Search effect,
+   * sets search results state after 1 second
+   */
   useEffect(() => {
     const timeOutId = setTimeout(() => {
       searchUser(search.value)
@@ -41,6 +64,7 @@ const Search = () => {
       clearTimeout(timeOutId);
     };
   }, [search.value]);
+
   return (
     <Dialog open={isSearch} onClose={searchCloseHandler}>
       <Stack p={"2rem"} direction={"column"} width={"25rem"}>

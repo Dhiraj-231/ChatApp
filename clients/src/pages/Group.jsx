@@ -25,30 +25,78 @@ import AvatarCard from "../components/shared/AvatarCard";
 import { sampleChats, SampleUser as User } from "../constants/SampleData.js";
 import UserItem from "../components/shared/UserItem.jsx";
 import { bgGridents } from "../constants/Color.js";
+/**
+ * Lazy loaded confirm delete dialog
+ */
 const ConfirmDeleteDialog = lazy(() =>
   import("../dialogs/ConfirmDeleteDialog.jsx")
 );
+
+/**
+ * Lazy loaded add member dialog
+ */
 const AddMemberDialog = lazy(() => import("../dialogs/AddMemberDialog.jsx"));
+
+/**
+ * Flag to determine if the user is a member of the group
+ */
 const isMember = false;
+
+/**
+ * Group page component
+ * @function Group
+ * @returns {JSX.Element} Group component
+ */
 const Group = () => {
+  // Open/close mobile menu state
   const [isMobileMenuOpen, setIsMobileOpen] = useState(false);
+  // Edit group name state
   const [isEdit, setIsEdit] = useState(false);
+  // Group name state
   const [groupName, setGroupName] = useState("");
+  // Group name updated value state
   const [groupNameUpdatedValue, setGroupNameUpdatedValue] = useState("");
+  // Confirm delete dialog state
   const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false);
+  // Navigate function
   const navigate = useNavigate();
+
+  /**
+   * Navigate back function
+   */
   const navigateBack = () => {
     navigate("/");
   };
+
+  /**
+   * Get the current chat id
+   */
   const chatId = useSearchParams()[0].get("group");
+
+  /**
+   * Toggle the mobile menu
+   */
   const handleMobile = () => {
     setIsMobileOpen((prev) => !prev);
   };
+
+  /**
+   * Update the group name
+   */
   const updateGroupName = () => {
     setIsEdit(false);
     console.log(groupNameUpdatedValue);
   };
+
+  /**
+   * Close the mobile menu
+   */
   const handleMobileClose = () => setIsMobileOpen(false);
+
+  /**
+   * Use effect to set the initial group name and
+   * clean up on unmount
+   */
   useEffect(() => {
     if (chatId) {
       setGroupName(`Group Name ${chatId}`);
@@ -60,20 +108,45 @@ const Group = () => {
       setIsEdit(false);
     };
   }, [chatId]);
+
+  /**
+   * Open the confirm delete dialog
+   */
   const openConfirmDeleteHandler = () => {
     setConfirmDeleteDialog(true);
   };
+
+  /**
+   * Close the confirm delete dialog
+   */
   const closeConfirmDeleteHandler = () => {
     setConfirmDeleteDialog(false);
   };
+
+  /**
+   * Handle the delete action
+   */
   const deleteHandler = () => {
     console.log("Delete Handler");
     closeConfirmDeleteHandler();
   };
+
+  /**
+   * Open the add member dialog
+   */
   const openAddMemberHandler = () => {};
+
+  /**
+   * Handle the remove member action
+   * @param {string} id - The id of the member to remove
+   */
   const removeMemberHandler = (id) => {
     console.log("Remove Member", id);
   };
+
+  /**
+   * Icon buttons component
+   */
   const IconBtns = (
     <>
       <Box
@@ -112,6 +185,10 @@ const Group = () => {
       </Tooltip>
     </>
   );
+
+  /**
+   * Group name component
+   */
   const GroupName = (
     <Stack
       direction={"row"}
@@ -142,6 +219,10 @@ const Group = () => {
       )}
     </Stack>
   );
+
+  /**
+   * Button group component
+   */
   const ButtonGroup = (
     <Stack
       direction={{
@@ -265,37 +346,83 @@ const Group = () => {
   );
 };
 
+/**
+ * Component for the group list in mobile view
+ * @component
+ * @param {string} w - The width of the component
+ * @param {array} myGroups - The groups the user is a member of
+ * @param {string} chatId - The current chat id
+ * @returns The GroupList component
+ */
 const GroupsList = ({ w = "100%", myGroups = [], chatId }) => (
+  // The component for the group list in mobile view
   <Stack
+    // The width of the component
     width={w}
+    // Set the background image and the height of the component
     sx={{
       backgroundImage: bgGridents,
       height: "100vh",
+      // Allow the component to scroll
       overflow: "auto",
     }}
   >
+    {/* If the user is a member of any groups render them, otherwise show a message */}
     {myGroups.length > 0 ? (
+      // Map over the groups and render each one
       myGroups.map((group) => (
-        <GroupListItem group={group} chatId={chatId} key={group._id} />
+        <GroupListItem
+          // The group to render
+          group={group}
+          // The current chat id
+          chatId={chatId}
+          // Assign a key based on the group id
+          key={group._id}
+        />
       ))
     ) : (
-      <Typography textAlign={"center"} padding={"1rem"}>
+      // Show a message if the user is not a member of any groups
+      <Typography
+        // Center the text
+        textAlign={"center"}
+        // Add some padding to the text
+        padding={"1rem"}
+      >
         No Group
       </Typography>
     )}
   </Stack>
 );
+/**
+ * Component for a group list item in mobile view
+ * @component
+ * @param {object} props
+ * @param {object} props.group - The group to render
+ * @param {string} props.chatId - The current chat id
+ * @returns The GroupListItem component
+ */
 const GroupListItem = memo(({ group, chatId }) => {
+  // Destructure the group object
   const { name, avatar, _id } = group;
 
+  // Return a link to the group page
   return (
     <Link
+      // Add a route to the group page
       to={`?group=${_id}`}
+      // If the link is for the current chat prevent the navigation
       onClick={(e) => {
         if (chatId === _id) e.preventDefault();
       }}
     >
-      <Stack direction={"row"} spacing={"1rem"} alignItems={"center"}>
+      <Stack
+        // Render a row with the avatar and group name
+        direction={"row"}
+        // Add some space between the elements
+        spacing={"1rem"}
+        // Align the elements to the center
+        alignItems={"center"}
+      >
         <AvatarCard avatar={avatar} />
         <Typography>{name}</Typography>
       </Stack>

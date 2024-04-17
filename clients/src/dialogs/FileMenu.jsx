@@ -11,6 +11,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { useSendAttachementsMutation } from "../redux/api/api";
 import { setIsFileMenu, setUploadingLoader } from "../redux/reducers/misc";
 
+/**
+ * FileMenu component renders a Material-UI Menu that allows users to send attachments.
+ *
+ * The component takes two props:
+ *
+ * - `anchorE1`: The anchor element for the Menu.
+ * - `chatId`: The id of the chat where the attachments will be sent.
+ *
+ */
 const FileMenu = ({ anchorE1, chatId }) => {
   const { isFileMenu } = useSelector((state) => state.misc);
   const dispatch = useDispatch();
@@ -19,10 +28,25 @@ const FileMenu = ({ anchorE1, chatId }) => {
   const audioRef = useRef(null);
   const fileRef = useRef(null);
   const [sendAttachements] = useSendAttachementsMutation();
+
+  /**
+   * Closes the FileMenu by dispatching an action to redux store
+   */
   const closeFileMenu = () => dispatch(setIsFileMenu(false));
+
+  /**
+   * Selects the input file element that is passed as a ref
+   * @param {Object} ref - A React ref object
+   */
   const selectRef = (ref) => {
     ref.current.click();
   };
+
+  /**
+   * Handles file change event for each input type and sends attachments to the server
+   * @param {Object} e - event object
+   * @param {String} key - The type of file being sent (image, audio, video or file)
+   */
   const fileChangeHandler = async (e, key) => {
     const files = Array.from(e.target.files);
     if (files.length <= 0) return;
@@ -47,6 +71,7 @@ const FileMenu = ({ anchorE1, chatId }) => {
       dispatch(setUploadingLoader(false));
     }
   };
+
   return (
     <Menu anchorEl={anchorE1} open={isFileMenu} onClose={closeFileMenu}>
       <div style={{ width: "10rem" }}>

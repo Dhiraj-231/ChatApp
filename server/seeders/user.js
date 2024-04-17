@@ -2,30 +2,34 @@ import { User } from "../models/User.model.js";
 import { Chat } from "../models/Chat.model.js";
 import { faker, simpleFaker } from "@faker-js/faker";
 import { Message } from "../models/Message.model.js";
+/**
+ * This function is used to create a number of users
+ * @param {number} numNumber The number of users to be created
+ */
 const createUser = async (numNumber) => {
     try {
-        const usersPromise = [];
-        for (let i = 0; i < numNumber; i++) {
-            usersPromise.push();
-            const tempUser = User.create({
-                name: faker.person.fullName(),
-                username: faker.internet.userName(),
-                password: "password",
-                avatar: {
-                    url: faker.image.avatar(),
-                    public_id: faker.system.fileName()
-                }
-            });
-            usersPromise.push(tempUser);
+        const usersPromise = []; // Array to store all the promises
+        for (let i = 0; i < numNumber; i++) { // Loop to create a number of users
+            usersPromise.push(
+                User.create({ // Create a promise for creating a user
+                    name: faker.person.fullName(), // Name of the user
+                    username: faker.internet.userName(), // Username of the user
+                    password: "password", // Password of the user
+                    avatar: {
+                        url: faker.image.avatar(), // Avatar url of the user
+                        public_id: faker.system.fileName() // Public id of the user
+                    }
+                })
+            );
         }
 
-        await Promise.all(usersPromise);
+        await Promise.all(usersPromise); // Wait for all the promises to resolve
 
-        console.log("User created..", numNumber);
-        process.exit(1);
-    } catch (error) {
-        console.log(error);
-        process.exist(1);
+        console.log("User created..", numNumber); // Log the successful creation of users
+        process.exit(1); // Exit the process with status 1
+    } catch (error) { // Catch any error that occurs
+        console.log(error); // Log the error
+        process.exit(1); // Exit the process with status 1
     }
 }
 export const createSingleChat = async (numberCount) => {

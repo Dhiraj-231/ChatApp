@@ -56,22 +56,38 @@ const LineChartOptions = {
   },
 };
 
+/**
+ * LineChart component for displaying revenue data
+ *
+ * @param {array} value - array of numbers representing revenue data
+ *
+ * @returns {JSX.Element} Line chart component
+ */
 const LineChart = ({ value = [] }) => {
+  /**
+   * Data object for Chart.js line chart
+   * @type {object}
+   */
   const data = {
-    labels,
+    labels, // array of day of week strings
     datasets: [
       {
-        data: value,
-        label: "Revenue",
-        fill: true,
-        backgroundColor: purpleLight,
-        borderColor: purple,
+        data, // array of numbers representing revenue data
+        label: "Revenue", // x-axis label
+        fill: true, // fill the area under the line
+        backgroundColor: purpleLight, // area fill color
+        borderColor: purple, // line color
       },
     ],
   };
 
+  /**
+   * Returns a line chart component
+   * @returns {JSX.Element} Chart.js line chart
+   */
   return <Line data={data} options={LineChartOptions} />;
 };
+
 
 const doughnutOptions = {
   responsive: true,
